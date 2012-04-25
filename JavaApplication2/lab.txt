@@ -1,0 +1,64 @@
+Egidijus Lukauskas
+1. Taisyklių aibė
+@T              # R1: T -> @
+@Y              # R2: Y -> @
+TZ              # R3: Z -> T
+ZT              # R4: T -> Z
+ZW              # R5: W -> Z
+WZ              # R6: Z -> W
+VW              # R7: W -> V
+WV              ## R8: V -> W
+DV              # R9: V -> D
+VD              ## R10: D -> V
+SD              # R11: D -> S
+DS              # R12: S -> D
+VY              # R13: Y -> V
+YV              # R14: V -> Y
+VX              # R15: X -> V
+XV              # R16: V -> X
+SE              # R17: E -> S
+ES              # R18: S -> E
+UE              # R19: E -> U
+EU              # R20: U -> E
+SA              # R21: A -> S
+AS              # R22: S -> A
+EA              # R23: A -> E
+AE              # R24: E -> A
+FE              # R25: E -> F
+EF              # R26: F -> E
+GF              # R27: F -> G
+FG              # R28: G -> F
+HG              # R29: G -> H
+GH              # R30: H -> G
+IH              # R31: H -> I
+HI              # R32: I -> H
+KI              # R33: I -> K
+IK              # R34: K -> I
+LK              # R35: K -> L
+KL              # R36: L -> K
+ML              # R37: L -> M
+LM              # R38: M -> L
+NM              # R39: M -> N
+MN              # R40: N -> M
+PN              # R41: N -> P
+NP              # R42: P -> N
+OM              # R43: M -> O
+MO              # R44: O -> M
+QO              # R45: O -> Q
+OQ              # R46: Q -> O
+QJ              # R47: J -> Q
+JQ              # R48: Q -> J
+RQ              # R49: Q -> R
+QR              # R50: R -> Q
+BR              # R51: R -> B
+RB              # R52: B -> R
+BS              # R53: S -> B
+SB              # R54: B -> S
+
+2. Faktai
+S
+
+3. Tikslas
+@
+
+Failo pabaiga.

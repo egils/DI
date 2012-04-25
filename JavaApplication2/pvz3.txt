@@ -1,0 +1,19 @@
+Egidijus Lukauskas
+1. Taisyklių aibė
+ZDC                              # R1  DC -> Z
+DC                               # R2  C -> D
+CB                               # R3  B -> C
+BA                               # R4  A -> B
+AD                               # R5  D -> A
+DT                               # R6  T -> D
+AG                               # R7  G -> A
+BH                               # R8  H -> B
+CJ                               # R9  J -> C
+
+2. Faktai
+TZ
+
+3. Tikslas
+Z
+
+Failo pabaiga.
