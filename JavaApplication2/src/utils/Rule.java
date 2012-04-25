@@ -38,15 +38,6 @@ public class Rule {
 		this.used = rule.isUsed();
 	}
 	
-	
-	public Rule(Rule rule, int level) {
-		this.conditions.addAll(rule.conditions);
-		this.results.addAll(rule.results);
-		this.name = rule.name;
-		this.used = rule.isUsed();
-		this.level = level;
-	}
-	
 	public Rule(String name, String rule, boolean debug) {
 		this.parseRuleString(rule);
 		this.name = name;

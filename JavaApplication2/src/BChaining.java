@@ -1,13 +1,10 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import utils.FReader;
 import utils.Rule;
 import exceptions.WFFException;
+import java.util.ArrayList;
 
 
 public class BChaining {
@@ -20,7 +17,6 @@ public class BChaining {
 	// Printing purpose variables.
 	private static boolean debug = false;
 	private static boolean protocol = true;
-	private static int protocolStep = 1;
 	
 	// Program's input-output data.
 	private static ArrayList<Rule> setOfRules = new ArrayList<Rule>();
@@ -37,7 +33,8 @@ public class BChaining {
 	 * @param args	command line arguments
 	 */
 	public static void main(String[] args) {
-		System.out.println("*** Egidijaus Lukausko FChaining programa pradeda darbą.");
+		System.out.println("*** Egidijaus Lukausko BChaining"
+                + " programa pradeda darbą.");
 		try {
 			// Initializing reader object.
 			if(args.length == 0) {
@@ -69,150 +66,99 @@ public class BChaining {
 			printDestination();
 			if(protocol)
 				System.out.println("\n[Programos darbo eiga]");
-			
-			// Call solver function to get the result status.
-			int solution = 1;
-			
-			backward(destination,"",1,setOfRules);
+
+			routeBCDestination(destination,"",1);
+            System.out.println("[Programos darbo eigos pabaiga]\n");
 			
 			if(protocol){
-				if(solution == -1) {
+				if(answer.isEmpty() && setOfNewFacts.isEmpty()) {
 					// Destination already in facts.
-					System.out.println((protocolStep++)+
-							". Galutinis tikslas jau pateiktas tarp faktų.");
-					System.out.println(
-							"Uždavinio sprendimas: {}.");
-				} else if((solution == -2) || (solution == 0)) {
+					System.out.println(". Galutinis tikslas jau pateiktas"
+                            + " tarp faktų.");
+					System.out.println("Uždavinio sprendimas: {}.");
+				} else if(answer.isEmpty() && !setOfNewFacts.isEmpty()) {
 					// Destination not reachable.
-					System.out.println((protocolStep++)+
-							". Galutinio tikslo pasiekti neįmanoma.");
-					System.out.println(
-							"Uždavinio sprendimas duotoje produkcijų sistemoje neegzistuoja.");
-				} else if(solution == 1) {
+					System.out.println(". Galutinio tikslo pasiekti"
+                            + " neįmanoma.");
+					System.out.println("Uždavinio sprendimas duotoje produkcijų"
+                            + " sistemoje neegzistuoja.");
+				} else if(!answer.isEmpty() && !setOfNewFacts.isEmpty()) {
 					// Destination reached.
-					System.out.println((protocolStep++)+
-							". Tikslas su duota produkcijų sistema pasiektas!");
-					System.out.print("Uždavinio sprendimas: {");
-					String delimiter = "";
-					// Print set of results.
-					for(Rule result : answer) {
-						System.out.print(delimiter+result.getName());
-						delimiter = "; ";
-					}
-					System.out.print("}.\n");
-				}
-				System.out.println("[Programos darbo eigos pabaiga]");
+					System.out.println("Tikslas su duota produkcijų"
+                            + " sistema pasiektas!");
+                   
+                    System.out.print("Uždavinio sprendimas: {");
+                    String delimiter = "";
+                    // Print set of results.
+                    for(Rule result : answer) {
+                        System.out.print(delimiter+result.getName());
+                        delimiter = "; ";
+                    }
+                    System.out.print("}.\n");
+                }
 			}
-		};
+		}
 		
 		// System has finished it's calculations.
-		System.out.println("\n*** Programa baigia darbą.");
+		System.out.println("\n*** Programa baigia darbą.");  
 	}
 	
-	private static int lastUsedLevel = 0;
 	private static ArrayList<String> testedDestinations = new ArrayList<String>();
-	private static boolean end = false;
-	private static void backward(String destination, String spaces, int level,
-			ArrayList<Rule> rules) {
-		Rule rule;
-		boolean found = false;
-		if(!testInFacts(destination,level)){
-			if(isInNewFacts(destination)) {
-				end = true;
-				System.out.println(spaces+level+". Einamas tikslas " + destination + " išvestas anksčiau.");
-				populateNewFacts(destination,level);
-				for(int i=0; i<answer.size(); i++ ){
-					if(answer.get(i).resultsString().equals(destination)){
-						rule = answer.get(i);
-						answer.remove(i);
-						answer.add(0, rule);
-					}
-				}
-				System.out.print("Uždavinio sprendimas: {");
-				String delimiter = "";
-				// Print set of results.
-				for(Rule result : answer) {
-					System.out.print(delimiter+result.getName());
-					delimiter = "; ";
-				}
-				System.out.print("}.\n");
-				System.exit(1);
-			} else {
-				testedDestinations.add(destination);
-				while((rule = getDestinationRule(destination, rules)) != null) {
-					System.out.println(spaces+level+". Einamas tikslas: "+destination+". Rasta taisykle "+rule+". Nauji tikslai: "+rule.conditionsString());
-					answer.add(0,new Rule(rule, level));
-					for(String cond : rule.getConditions()) {
-						if(testForLoop(cond,rules)){
-							answer.remove(0);
-							if(lastUsedLevel > level)
-								answer.remove(0);
-							lastUsedLevel = level;
-							System.out.println(spaces+"    "+(level+1)+". Tikslas: "+cond+". <<<<<<<<<<<Ciklas>>>>>>>>>>");
-						} else {
-//							loopedRules.put(rule, level);
-							loopedRules.add(new Rule(rule, level));
-							if(testInFacts(cond, level)){
-								System.out.println(spaces+"  Tikslas "+cond+" yra tarp faktų.");
-								System.out.print("Uždavinio sprendimas: {");
-								String delimiter = "";
-								// Print set of results.
-								for(Rule result : answer) {
-									System.out.print(delimiter+result.getName());
-									delimiter = "; ";
-								}
-								System.out.print("}.\n");
-							} else {
-								backward(cond, spaces+"    ", level+1, cloneList(rules));
-								if(testInFacts(cond, level)){
-									found = true;
-									break;
-								}
-							}
-						}
-					}
-					if(found)
-						break;
-				}
-				
-				if(isDeadEnd(destination)){
-					System.out.println(spaces+level+". Pasiekta aklavietė su tikslu: " + destination + ".");
-				}
-			}
-		}
-	}
-	
-	private static void removeLoopsFromLevel(int level) {
-		int i = 0;
-		while(i<loopedRules.size()) {
-			if(loopedRules.get(i).level >= level){
-				loopedRules.remove(i);
-				System.out.println("removed");
-			} else {
-				i++;
-			}
-		}
-//		for(Map.Entry<Rule, Integer> lRule2 : loopedRules.entrySet()) {
-//			
-//		}
-	}
-	
-	private static void removeAnswersFromLevel(int level) {
-		int i = 0;
-		while(i<answer.size()) {
-			if(answer.get(i).level >= level){
-				System.out.println("removed answer"+answer.get(i));
-				answer.remove(i);
-			} else {
-				i++;
-			}
-		}
-//		for(Map.Entry<Rule, Integer> lRule2 : loopedRules.entrySet()) {
-//			
-//		}
-	}
 
-	private static boolean isInNewFacts(String destination) {
+    private static void routeBCDestination(String destination, String spaces, int level) { 
+        ArrayList<Rule> rulesToApply = new ArrayList<Rule>();
+		int sublevel = 0;
+		if(!testInFacts(destination)){
+			
+                Rule ruleWithDestination;
+                while((ruleWithDestination = getDestinationRule(destination)) != null) {
+                    rulesToApply.add(ruleWithDestination);
+                }
+                
+                if(rulesToApply.isEmpty()) {
+                    System.out.println(spaces+level+". Aklavietė. Nėra taisyklių šio fakto išvedimui.");
+                }
+                
+                if(testedDestinations.contains(destination)) {
+                    System.out.println(spaces+"   Ciklas su tikslu: "+destination+" ------------------------");
+                    rulesToApply.clear();
+                }
+                
+                for(Rule rule : rulesToApply) {
+                    if(!isInNewFacts(destination)){
+                        sublevel++;
+                        System.out.println(spaces+level+". Einamas tikslas: "+destination+". Rasta taisykle "+rule+". Nauji tikslai: "+rule.conditionsString());
+
+                        testedDestinations.add(rule.resultsString());
+                        loopedRules.add(rule);
+
+                        for(String condition : rule.getConditions()) {
+                            if(!isInNewFacts(condition)) {
+                                routeBCDestination(condition,spaces+"    ",level+1);
+                            } else {
+                                System.out.println(spaces+"    "+(level+1)+". Tikslas: "+condition+" jau išvestas anksčiau.");
+                            }
+                        }
+                        
+                        if(rule.checkConditions(setOfNewFacts)) {
+                            setOfNewFacts.add(rule.resultsString());
+                            answer.add(rule);
+                            //System.out.println(spaces+"   Naujai gautas faktas: "+rule.resultsString()+". Taisyklė: "+rule);
+                        } else {
+                           // System.out.println(spaces+"   Tikslo "+destination+" iš taisyklės "+rule+" išvesti nepavyko.");
+                        }
+                        
+                        rule.setUsed(false);
+                        testedDestinations.remove(rule.resultsString());
+                    } 
+                }	
+		} else { 
+            System.out.println(spaces+level+". Tikslas "+destination+" yra tarp faktų.");
+            setOfNewFacts.add(destination);
+        }
+	}
+	
+    private static boolean isInNewFacts(String destination) {
 		for(String fact: setOfNewFacts){
 			if(destination.equals(fact)){
 				return true;
@@ -220,17 +166,6 @@ public class BChaining {
 		}
 		return false;
 	}
-
-	private static boolean testInFacts(String dest, int level) {
-		for(String fact : setOfFacts) {
-			if(fact.equals(dest)) {
-				populateNewFacts(dest, level);
-				return true;
-			}
-		}
-		return false;
-	}
-	
 
 	private static boolean testInFacts(String dest) {
 		for(String fact : setOfFacts) {
@@ -240,84 +175,20 @@ public class BChaining {
 		}
 		return false;
 	}
-	
-	private static void populateNewFacts(String dest, int level) {
-		addNewDest(dest);
-//		System.out.println(loopedRules.size());
-//		for(Map.Entry<Rule, Integer> lRule2 : loopedRules.entrySet()) {
-//			System.out.print(lRule2.getKey()+ " ");
-//		}
-//		System.out.println(loopedRules.entrySet().size());
-//		System.out.println();
-		for(int i=level;i>0;i--){
-//			for(Map.Entry<Rule, Integer> lRule : loopedRules.entrySet()) {
-			for(Rule lRule : loopedRules) {
-				int count = 0;
-//				System.out.println("cia");
-				for(String faktas: lRule.getConditions()){
-					for(String row: setOfNewFacts){
-						if(faktas.equals(row)){
-							count++;
-						}
-					}
-				}
-				if(count == lRule.getConditions().size()){
-					addNewDest(lRule.resultsString());	
-				}	
-			}
-		}
-	}
+    
+    public static void printNewFacts(){
+        System.out.print("Nauji faktai: {");
+        String delimiter = "";
+        // Print set of results.
+        for(String result : setOfNewFacts) {
+            System.out.print(delimiter+result);
+            delimiter = "; ";
+        }
+        System.out.print("}.\n");
+    }
 
-	private static void addNewDest(String dest) {
-		boolean toAdd=true;
-		for(String d : setOfNewFacts){
-			if(d.equals(dest)) 
-				toAdd=false;
-		}
-		if(toAdd)
-			setOfNewFacts.add(dest);		
-	}
-
-	public static boolean isDeadEnd(String dest){
-		boolean test = false;
-		
-		for(int i=0; i<setOfRules.size(); i++){
-			if(setOfRules.get(i).resultsString().equals(dest)){
-				test = true;
-			}
-		}
-		if(!test){
-			if(answer.size() > 0){	
-				answer.remove(0);
-				if(answer.size() > 0){	
-					answer.remove(0);
-				}
-			}
-			return true;
-		}
-		return false;
-	}
-
-	public static ArrayList<Rule> cloneList(ArrayList<Rule> list) {
-	    ArrayList<Rule> clone = new ArrayList<Rule>(list.size());
-	    for(Rule rule : list) {
-	    	clone.add(new Rule(rule));
-	    }
-	    return clone;
-	}
-
-	private static boolean testForLoop(String cond, ArrayList<Rule> rules) {
-		for(Rule rule : rules) {
-			if(rule.isUsed() && rule.checkResultsForDest(cond)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static Rule getDestinationRule(String destination,
-			ArrayList<Rule> rules) {
-		for(Rule rule : rules) {
+	private static Rule getDestinationRule(String destination) {
+		for(Rule rule : setOfRules) {
 			if(rule.checkResultsForDest(destination) && rule.isUsed() == false) {
 				rule.setUsed(true);
 				return rule;
@@ -325,7 +196,6 @@ public class BChaining {
 		}
 		return null;
 	}
-
 
 	/**
 	 * Iterates the set of rules and prints every element in it.
@@ -383,7 +253,8 @@ public class BChaining {
 					"„produkcijos.txt“):");
 			data = input.readLine();
 		} catch (IOException e) {
-			e.printStackTrace();
+             System.out.println(e.getMessage());
+            
 		}
 		// Create new file reader object with read filename.
 		reader = new FReader(data, debug);

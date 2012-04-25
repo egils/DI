@@ -1,19 +1,66 @@
 Egidijus Lukauskas
 1. Taisyklių aibė
-ZCD                              # R1  DC -> Z
-DC                               # R2  C -> D
-CB                               # R3  B -> C
-BA                               # R4  A -> B
-AD                               # R5  D -> A
-DT                               # R6  T -> D
-AG                               # R7  G -> A
-BH                               # R8  H -> B
-CJ                               # R9  J -> C
+@y
+@t
+as
+sa
+bs
+sb
+cs
+sc
+ds
+sd
+ea
+ae
+fe
+ef
+gf
+fg
+hg
+gh
+ih
+hi
+jh
+hj
+ki
+ik
+lk
+kl
+ml
+lm
+nm
+mn
+om
+mo
+pn
+np
+qo
+oq
+jq
+qj
+rq
+qr
+br
+rb
+uc
+cu
+vd
+dv
+wv
+vw
+xv
+vx
+zw
+wz
+tz
+zt
+yv
+vy
 
 2. Faktai
-T
+s
 
 3. Tikslas
-Z
+@
 
 Failo pabaiga.
