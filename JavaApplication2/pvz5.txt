@@ -1,6 +1,6 @@
 Egidijus Lukauskas
 1. Taisyklių aibė
-ZCD                              # R1  DC -> Z
+ZDC                              # R1  DC -> Z
 DC                               # R2  C -> D
 CB                               # R3  B -> C
 BA                               # R4  A -> B
