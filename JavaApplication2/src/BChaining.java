@@ -6,7 +6,11 @@ import utils.Rule;
 import exceptions.WFFException;
 import java.util.ArrayList;
 
-
+/**
+ * BChaining is class, which simulates reading production system for backward
+ * chaining and it's algorithm itself.
+ * @author Egidijus Lukauskas
+ */
 public class BChaining {
 
 	private static FReader reader;
@@ -20,11 +24,8 @@ public class BChaining {
 	
 	// Program's input-output data.
 	private static ArrayList<Rule> setOfRules = new ArrayList<Rule>();
-	private static ArrayList<Rule> loopedRules = new ArrayList<Rule>();
-
 	private static ArrayList<String> setOfFacts = new ArrayList<String>();
 	private static ArrayList<String> setOfNewFacts = new ArrayList<String>();
-//	private static Map<Rule, Integer> loopedRules = new HashMap<Rule,Integer>();
 	private static String destination;
 	private static ArrayList<Rule> answer = new ArrayList<Rule>();
 	
@@ -71,14 +72,14 @@ public class BChaining {
             System.out.println("[Programos darbo eigos pabaiga]\n");
 			
 			if(protocol){
-				if(answer.isEmpty() && setOfNewFacts.isEmpty()) {
+				if(answer.isEmpty() && !setOfNewFacts.isEmpty()) {
 					// Destination already in facts.
-					System.out.println(". Galutinis tikslas jau pateiktas"
+					System.out.println("Galutinis tikslas jau pateiktas"
                             + " tarp faktų.");
 					System.out.println("Uždavinio sprendimas: {}.");
-				} else if(answer.isEmpty() && !setOfNewFacts.isEmpty()) {
+				} else if(answer.isEmpty() && setOfNewFacts.isEmpty()) {
 					// Destination not reachable.
-					System.out.println(". Galutinio tikslo pasiekti"
+					System.out.println("Galutinio tikslo pasiekti"
                             + " neįmanoma.");
 					System.out.println("Uždavinio sprendimas duotoje produkcijų"
                             + " sistemoje neegzistuoja.");
@@ -105,59 +106,89 @@ public class BChaining {
 	
 	private static ArrayList<String> testedDestinations = new ArrayList<String>();
 
+    /*
+     * Backward Chaining algorythm function. Does not return anything, but 
+     * changes the elements of static global variable ArrayList<Rule> answer.
+     */
     private static void routeBCDestination(String destination, String spaces, int level) { 
         ArrayList<Rule> rulesToApply = new ArrayList<Rule>();
 		int sublevel = 0;
+        /* Test if the given destination is not in original facts */
 		if(!testInFacts(destination)){
 			
+                /* Get all the rules with given destination */
                 Rule ruleWithDestination;
-                while((ruleWithDestination = getDestinationRule(destination)) != null) {
+                while((ruleWithDestination = getDestinationRule(destination)) != null)
                     rulesToApply.add(ruleWithDestination);
-                }
                 
-                if(rulesToApply.isEmpty()) {
-                    System.out.println(spaces+level+". Aklavietė. Nėra taisyklių šio fakto išvedimui.");
-                }
+                /*  Test for DeadEnd */
+                if(rulesToApply.isEmpty()) 
+                    System.out.println(spaces+level+
+                            ". Aklavietė. Nėra taisyklių šio fakto išvedimui.");
                 
+                /* Test for loop */
                 if(testedDestinations.contains(destination)) {
-                    System.out.println(spaces+"   Ciklas su tikslu: "+destination+" ------------------------");
+                    System.out.println(spaces+"   Ciklas su tikslu: "+
+                            destination+" ------------------------");
                     rulesToApply.clear();
                 }
                 
+                /* Try to apply every rule with given destination */
                 for(Rule rule : rulesToApply) {
                     if(!isInNewFacts(destination)){
                         sublevel++;
-                        System.out.println(spaces+level+". Einamas tikslas: "+destination+". Rasta taisykle "+rule+". Nauji tikslai: "+rule.conditionsString());
+                        System.out.println(spaces+level+". Einamas tikslas: "+
+                                destination+". Rasta taisykle "+rule+
+                                ". Nauji tikslai: "+rule.conditionsString());
 
+                        /* 
+                         * Save destinations we already checked to 
+                         * beware of loops 
+                         */
                         testedDestinations.add(rule.resultsString());
-                        loopedRules.add(rule);
 
+                        /* Test every condition for the rule */
                         for(String condition : rule.getConditions()) {
+                            /* If not have this as a fact already */
                             if(!isInNewFacts(condition)) {
-                                routeBCDestination(condition,spaces+"    ",level+1);
+                                /* Recoursive call with new destination */
+                                routeBCDestination(condition,spaces+"    ",
+                                                    level+1);
                             } else {
-                                System.out.println(spaces+"    "+(level+1)+". Tikslas: "+condition+" jau išvestas anksčiau.");
+                                /* Already in facts */
+                                System.out.println(spaces+"    "+(level+1)+
+                                        ". Tikslas: "+condition+
+                                        " jau išvestas anksčiau.");
                             }
                         }
                         
+                        /* 
+                         * If all conditions are applied add new rule to the
+                         * results array
+                         */
                         if(rule.checkConditions(setOfNewFacts)) {
                             setOfNewFacts.add(rule.resultsString());
                             answer.add(rule);
-                            //System.out.println(spaces+"   Naujai gautas faktas: "+rule.resultsString()+". Taisyklė: "+rule);
-                        } else {
-                           // System.out.println(spaces+"   Tikslo "+destination+" iš taisyklės "+rule+" išvesti nepavyko.");
                         }
                         
+                        /* Restore the rule we just checked */
                         rule.setUsed(false);
                         testedDestinations.remove(rule.resultsString());
                     } 
                 }	
 		} else { 
-            System.out.println(spaces+level+". Tikslas "+destination+" yra tarp faktų.");
+            /* Already in original facts */
+            System.out.println(spaces+level+". Tikslas "+destination+
+                    " yra tarp faktų.");
             setOfNewFacts.add(destination);
         }
 	}
 	
+    /**
+     * Checks if given destination is in new facts list.
+     * @param destination   String with destination to check
+     * @return boolean
+     */
     private static boolean isInNewFacts(String destination) {
 		for(String fact: setOfNewFacts){
 			if(destination.equals(fact)){
@@ -167,6 +198,11 @@ public class BChaining {
 		return false;
 	}
 
+    /**
+     * Checks if given destination is in original facts list.
+     * @param dest  String with destination to check
+     * @return boolean
+     */
 	private static boolean testInFacts(String dest) {
 		for(String fact : setOfFacts) {
 			if(fact.equals(dest)) {
@@ -176,17 +212,11 @@ public class BChaining {
 		return false;
 	}
     
-    public static void printNewFacts(){
-        System.out.print("Nauji faktai: {");
-        String delimiter = "";
-        // Print set of results.
-        for(String result : setOfNewFacts) {
-            System.out.print(delimiter+result);
-            delimiter = "; ";
-        }
-        System.out.print("}.\n");
-    }
-
+    /**
+     * Finds 1st unused rule with given destination.
+     * @param destination   String with rule restination we need.
+     * @return Rule object with given destination and isUsed() == false.
+     */
 	private static Rule getDestinationRule(String destination) {
 		for(Rule rule : setOfRules) {
 			if(rule.checkResultsForDest(destination) && rule.isUsed() == false) {

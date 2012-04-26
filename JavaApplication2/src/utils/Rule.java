@@ -19,7 +19,6 @@ public class Rule {
 	private boolean debug = false; 
 	private String name = "";
 	private boolean used = false;
-	public int level = 0;
 	
 	/*
 	 * Constructors
@@ -29,13 +28,6 @@ public class Rule {
 		this.name = name;
 		if(debug)
 			System.out.println("Pridėta nauja taisyklė: "+this);
-	}
-	
-	public Rule(Rule rule) {
-		this.conditions.addAll(rule.conditions);
-		this.results.addAll(rule.results);
-		this.name = rule.name;
-		this.used = rule.isUsed();
 	}
 	
 	public Rule(String name, String rule, boolean debug) {
@@ -105,6 +97,11 @@ public class Rule {
 		return ruleApplies;
 	}
 	
+    /**
+     * Checks results for given destination.
+     * @param destination   String with destination
+     * @return boolean
+     */
 	public boolean checkResultsForDest(String destination) {
 		boolean ruleApplies = false;
 		for(String result : this.results) {
@@ -158,6 +155,7 @@ public class Rule {
 		this.used = used;
 	}
 	
+    @Override
 	public String toString() {
 		String retVal = this.name+": ";
 		String delimiter = "";
