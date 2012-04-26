@@ -138,7 +138,7 @@ public class BChaining {
                     if(!isInNewFacts(destination)){
                         sublevel++;
                         System.out.println(spaces+level+". Einamas tikslas: "+
-                                destination+". Rasta taisykle "+rule+
+                                destination+". Rasta taisyklė "+rule+
                                 ". Nauji tikslai: "+rule.conditionsString());
 
                         /* 
